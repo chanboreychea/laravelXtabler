@@ -10,7 +10,7 @@
             <div class="card">
                 <form action="/admins/change-password" method="POST">
                     @csrf
-                    @method('PATCH')
+                    <input type="hidden" name="_method" value="PATCH">
                     <div class="card-status-top bg-blue"></div>
                     <div class="card-body">
 
@@ -95,7 +95,6 @@
                                     </div>
                                 </span>
                             </div>
-                            <div id="password-error" class="text-danger mt-2"></div>
                             @error('confirm_new_password')
                                 <div class="text-danger mt-2">
                                     {{ $message }}

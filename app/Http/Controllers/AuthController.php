@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 
@@ -29,14 +31,18 @@ class AuthController extends Controller
         $username = $request->input('username');
         $password = $request->input('password');
 
-        if ($username == 'admin@gmail.com' && $password == "123") {
+        $user = User::where('email', $username)->first();
+
+        if ($user &&  Hash::check($password, $user->password)) {
+
             $request->session()->pull('is_admin_logged_in');
             $request->session()->pull('admin_id');
             session([
                 'is_admin_logged_in' => true,
-                'admin_id' => "B0r3y!19",
+                'admin_id' => $user->id,
                 'login_at' => now()
             ]);
+
             return redirect('/dashboard');
         }
 
@@ -73,5 +79,21 @@ class AuthController extends Controller
             'confirm_new_password.required' => 'Please confirm your new password.',
             'confirm_new_password.same' => 'The confirmation password does not match.',
         ]);
+
+        try {
+            $user = User::find(session('admin_id'));
+
+            $password = $request->input('password');
+
+            if (Hash::check($password, $user->password)) {
+                $user->password = Hash::make($request->input('new_password'));
+                $user->save();
+                return redirect('/dashboard')->with('success', 'Password changed successfully.');
+            }
+
+            return redirect()->back()->with('error', 'Current password is incorrect.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred while changing the password.');
+        }
     }
 }

@@ -17,7 +17,48 @@
                 </a>
             @endif
 
-            @yield('message')
+            @php
+                $alerts = [];
+
+                if (session('success')) {
+                    $alerts[] = ['type' => 'success', 'message' => session('success')];
+                }
+
+                if (session('error')) {
+                    $alerts[] = ['type' => 'danger', 'message' => session('error')];
+                }
+
+            @endphp
+
+            @if (!empty($alerts))
+                <div class="alert-wrapper top-0 start-50 translate-middle-x mt-3"
+                    style="z-index: 1050; position: fixed; width: 100%;">
+                    @foreach ($alerts as $index => $alert)
+                        <div id="alert-{{ $index }}"
+                            class="alert-container d-flex align-items-center justify-content-center mb-2"
+                            data-aos="fade-down" data-aos-delay="{{ 100 + $index * 100 }}">
+                            <div class="alert alert-important text-light bg-{{ $alert['type'] }} alert-dismissible d-flex align-items-center shadow"
+                                role="alert">
+                                <div class="m-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24"
+                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <circle cx="12" cy="12" r="9" />
+                                        <line x1="12" y1="8" x2="12" y2="12" />
+                                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                                    </svg>
+                                </div>
+                                <div class="fs-5 ms-2">
+                                    {{ $alert['message'] }}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
         <!-- END NAVBAR LOGO -->
         <div class="navbar-nav flex-row order-md-last">
